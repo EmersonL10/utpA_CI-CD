@@ -1,1 +1,42 @@
-#
+name: CI de Angular
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: formulario-ci
+
+    steps:
+      - name: Obtener el código
+        uses: actions/checkout@v7
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar pruebas
+        run: npm exec -- ng test --watch=false
+
+      - name: Compilar Angular
+        run: npm run build
+
+      - name: Guardar el build como artefacto
+        uses: actions/upload-artifact@v7
+        with:
+          name: formulario-ci-build
+          path: formulario-ci/dist/formulario-ci
+          if-no-files-found: error
